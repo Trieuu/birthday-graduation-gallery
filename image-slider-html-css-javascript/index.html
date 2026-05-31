@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Graduation, my Princess</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="menu-screen" aria-label="Gallery menu">
+        <button class="menu-heading" type="button" data-gallery="us" data-protected="true">
+            <h1>Happy Graduation, my Princess</h1>
+            <p>18/04/2026</p>
+        </button>
+
+        <div class="menu-cluster">
+            <button class="menu-card menu-card--besties" type="button" data-gallery="besties">
+                <img src="../besties/MGX_4821.jpg" alt="">
+                <span>Besties</span>
+            </button>
+
+            <button class="menu-card menu-card--family" type="button" data-gallery="family">
+                <img src="../family/IMG_1250.JPG" alt="">
+                <span>Family</span>
+            </button>
+
+            <button class="menu-card menu-card--princess" type="button" data-gallery="princess">
+                <img src="../princess/IMG_1343.JPG" alt="">
+                <span>Princess</span>
+            </button>
+
+            <button class="menu-card menu-card--friends" type="button" data-gallery="friends">
+                <img src="../friends/retouch_2026041911180585.jpg" alt="">
+                <span>Friends</span>
+            </button>
+
+            <button class="menu-card menu-card--gifts" type="button" data-gallery="gifts">
+                <img src="../gifts/IMG_1503.JPG" alt="">
+                <span>Gifts</span>
+            </button>
+        </div>
+    </main>
+
+    <section class="password-panel" aria-hidden="true">
+        <form class="password-box">
+            <button class="password-close" type="button" aria-label="Close password prompt">&times;</button>
+            <h2>To you, my love</h2>
+            <label for="us-password">Password</label>
+            <input id="us-password" type="password" autocomplete="off" inputmode="numeric">
+            <p class="password-error" aria-live="polite"></p>
+            <button class="password-submit" type="submit">Open</button>
+        </form>
+    </section>
+
+    <section class="gallery-shell" aria-hidden="true">
+        <div class="gallery-topbar">
+            <button class="back-button" type="button" aria-label="Back to main menu">&lt;</button>
+            <h2 class="active-gallery-title">Princess</h2>
+        </div>
+
+        <section class="carousel" aria-live="polite" aria-label="Photo carousel">
+            <button class="arrow prev" type="button" aria-label="Previous photo">&lt;</button>
+            <div class="list"></div>
+            <button class="arrow next" type="button" aria-label="Next photo">&gt;</button>
+        </section>
+
+        <section class="postcard-view" aria-label="Postcard to my love">
+            <article class="postcard">
+                <figure class="postcard-photo">
+                    <img src="../us/photo-photo_1775912558712_filtered.jpg.jpg" alt="">
+                </figure>
+                <div class="postcard-message">
+                    <p class="postcard-kicker">To you, my love</p>
+                    <h3>Bà xã ui,</h3>
+                    <div class="postcard-letter">
+                        <p>Vậy là bà xã của anh đã chính thức tốt nghiệp rùi, yayyyyy!</p>
+                        <p>Mỗi lần nghĩ lại, anh vẫn thấy vui, hạnh phúc và tự hào về em nhiều lắm, bà xã của anh &lt;3.</p>
+                        <p>Anh vui vì đây là một ngày thật quan trọng của em, và anh được nhìn thấy bà xã của anh tỏa sáng, rực rỡ trong ngày đặc biệt ấy. Anh hạnh phúc vì đã được đồng hành cùng em trên hành trình này, từ đầu — hay là từ giữa giữa một chút hì hì — cho đến tận những khoảnh khắc cuối cùng.</p>
+                        <p>Từng khoảng thời gian cùng nhau planning, chạy task, động viên nhau, cùng vượt qua khó khăn, cùng ngồi lại để tìm cách giải quyết mọi thứ; rồi cả những lúc mệt mỏi, vui vẻ và cả buồn bã nữa. Chính những khoảnh khắc ấy đã làm cho hành trình này trở nên đáng nhớ hơn, sâu sắc hơn, và cũng từ đó anh càng nhìn thấy rõ hơn sự kiên trì, cố gắng cùng tinh thần trách nhiệm của em. Vì vậy, anh thật sự cảm thấy tự hào về em rất nhiều. Bà xã của anh giỏi lắm, nên em cũng hãy luôn tự tin vào chính mình nhiều hơn nữa nhé (^-^).</p>
+                        <p>Khi viết lại những dòng này, anh lại thấy lâng lâng niềm vui như lúc biết điểm, lúc mọi thứ được chốt xong, lúc cùng em chuẩn bị cho buổi lễ, và cả lúc được dự lễ tốt nghiệp cùng em. Anh cảm thấy mình thật may mắn vì đã được có mặt và đồng hành cùng em trong một chặng đường ý nghĩa như vậy.</p>
+                        <p>Có thể phía trước sẽ còn nhiều thử thách và khó khăn, nhưng anh tin rằng với sự cố gắng, trách nhiệm, sự thông minh và trái tim mạnh mẽ của em, bà xã của anh sẽ đều vượt qua được hết thảy \(^-^)/.</p>
+                        <p>Hãy cho anh được tiếp tục ở bên cạnh để đồng hành, lắng nghe, yêu thương, chăm sóc và sẻ chia cùng bà xã trên hành trình của em nhé. Anh yêu em nhiều lắm, bà xã của anh.</p>
+                        <p class="postcard-signature">Ông xã mập của bà xã</p>
+                    </div>
+                </div>
+            </article>
+        </section>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+</html>
