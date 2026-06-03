@@ -8,7 +8,15 @@
 }
 
 :root {
-    --page-bg-image: url('../background-horizontal.png');
+    --page-bg-image: url('../background-horizontal.png?v=20260603-bg2');
+    --page-bg-position: center;
+}
+
+@media (orientation: portrait), (max-width: 700px) {
+    :root {
+        --page-bg-image: url('../background-vertical.png?v=20260603-bg2');
+        --page-bg-position: center top;
+    }
 }
 
 body {
@@ -17,7 +25,7 @@ body {
     background:
         radial-gradient(circle at 50% 20%, rgba(255, 223, 110, 0.16), transparent 32%),
         linear-gradient(145deg, rgba(10, 10, 10, 0.84), rgba(21, 18, 14, 0.82) 50%, rgba(7, 7, 7, 0.9)),
-        var(--page-bg-image) center / cover no-repeat,
+        var(--page-bg-image) var(--page-bg-position) / cover no-repeat,
         #070707;
     color: #fff;
 }
@@ -294,7 +302,7 @@ button:focus-visible {
     background:
         radial-gradient(circle at 50% 20%, rgba(255, 223, 110, 0.1), transparent 34%),
         linear-gradient(145deg, rgba(8, 8, 8, 0.9), rgba(14, 11, 8, 0.92) 54%, rgba(3, 3, 3, 0.96)),
-        var(--page-bg-image) center / cover no-repeat,
+        var(--page-bg-image) var(--page-bg-position) / cover no-repeat,
         #080808;
     opacity: 0;
     pointer-events: none;
