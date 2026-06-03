@@ -8,13 +8,13 @@
 }
 
 :root {
-    --page-bg-image: url('../background-horizontal.png?v=20260603-bg3');
+    --page-bg-image: url('../background-horizontal.png?v=20260603-perf1');
     --page-bg-position: center;
 }
 
 @media (orientation: portrait), (max-width: 700px) {
     :root {
-        --page-bg-image: url('../background-vertical.png?v=20260603-bg3');
+        --page-bg-image: url('../background-vertical.png?v=20260603-perf1');
         --page-bg-position: center top;
     }
 }
@@ -331,6 +331,40 @@ button:focus-visible {
     background: linear-gradient(180deg, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0));
 }
 
+.gallery-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 22;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.18s ease, visibility 0.18s ease;
+}
+
+.gallery-loader::before {
+    content: '';
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #ffdf6e;
+    border-radius: 50%;
+    animation: loaderSpin 0.8s linear infinite;
+}
+
+.gallery-shell.is-loading .gallery-loader {
+    opacity: 1;
+    visibility: visible;
+}
+
 .back-button,
 .arrow {
     border: 1px solid rgba(255, 255, 255, 0.26);
@@ -342,6 +376,12 @@ button:focus-visible {
     font-weight: 700;
     line-height: 1;
     transition: background 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+}
+
+@keyframes loaderSpin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .back-button {

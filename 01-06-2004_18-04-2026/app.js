@@ -129,7 +129,9 @@ const galleryLabels = {
 };
 
 const VISIBLE_OFFSETS = [0, -1, 1, -2, 2];
+const PRELOAD_OFFSETS = [0, 1, -1, 2, -2];
 const TRANSITION_TIME = 240;
+const LOADING_FALLBACK_TIME = 1100;
 const US_PASSWORD = '12092025';
 const nextBtn = document.querySelector('.next');
 const prevBtn = document.querySelector('.prev');
@@ -145,6 +147,7 @@ const passwordForm = document.querySelector('.password-box');
 const passwordInput = document.querySelector('#us-password');
 const passwordError = document.querySelector('.password-error');
 const passwordClose = document.querySelector('.password-close');
+const galleryLoader = document.querySelector('.gallery-loader');
 
 let activeGallery = 'besties';
 let activeIndex = 0;
@@ -152,6 +155,8 @@ let transitionTimeout;
 let isAnimating = false;
 let currentMenuButton = null;
 let pendingProtectedButton = null;
+let loadingToken = 0;
+const imageCache = new Map();
 
 function getWrappedIndex(images, index) {
     return (index + images.length) % images.length;
@@ -181,6 +186,85 @@ function getPositionClass(offset) {
     return 'is-hidden';
 }
 
+function wait(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
+
+function preloadImage(src) {
+    if (!src) {
+        return Promise.resolve();
+    }
+
+    if (imageCache.has(src)) {
+        return imageCache.get(src);
+    }
+
+    const image = new Image();
+    image.decoding = 'async';
+    image.src = src;
+
+    const promise = image.decode
+        ? image.decode().catch(() => undefined)
+        : new Promise((resolve) => {
+            image.onload = resolve;
+            image.onerror = resolve;
+        });
+
+    imageCache.set(src, promise);
+    return promise;
+}
+
+function preloadGalleryImages(galleryName, centerIndex = 0, limit = 3) {
+    const images = galleries[galleryName] || [];
+
+    if (!images.length || galleryName === 'us') {
+        return [];
+    }
+
+    return PRELOAD_OFFSETS.slice(0, limit).map((offset) => {
+        const imageIndex = getWrappedIndex(images, centerIndex + offset);
+        return preloadImage(images[imageIndex]);
+    });
+}
+
+function scheduleGalleryWarmup(galleryName, limit = 3) {
+    if (galleryName === 'us') {
+        return;
+    }
+
+    const warmup = () => preloadGalleryImages(galleryName, 0, limit);
+
+    if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(warmup, { timeout: 1600 });
+        return;
+    }
+
+    setTimeout(warmup, 240);
+}
+
+function scheduleMenuWarmups() {
+    if (navigator.connection?.saveData) {
+        return;
+    }
+
+    Object.keys(galleries).forEach((galleryName, index) => {
+        if (galleryName === 'us') {
+            return;
+        }
+
+        setTimeout(() => {
+            preloadGalleryImages(galleryName, 0, 2);
+        }, 600 + index * 420);
+    });
+}
+
+function setGalleryLoading(isLoading) {
+    galleryShell.classList.toggle('is-loading', isLoading);
+    galleryLoader.setAttribute('aria-hidden', String(!isLoading));
+}
+
 function createSlide(imageSrc, galleryKey, index, offset) {
     const item = document.createElement('button');
     const image = document.createElement('img');
@@ -196,7 +280,8 @@ function createSlide(imageSrc, galleryKey, index, offset) {
     image.alt = `${galleryLabels[galleryKey]} photo ${index + 1}`;
     image.decoding = 'async';
     image.draggable = false;
-    image.loading = offset === 0 ? 'eager' : 'lazy';
+    image.fetchPriority = offset === 0 ? 'high' : 'low';
+    image.loading = Math.abs(offset) <= 1 ? 'eager' : 'lazy';
 
     item.appendChild(image);
 
@@ -216,9 +301,8 @@ function preloadNearbyImages() {
         return;
     }
 
-    [activeIndex - 1, activeIndex + 1, activeIndex + 2].forEach((index) => {
-        const image = new Image();
-        image.src = images[getWrappedIndex(images, index)];
+    PRELOAD_OFFSETS.forEach((offset) => {
+        preloadImage(images[getWrappedIndex(images, activeIndex + offset)]);
     });
 }
 
@@ -274,14 +358,34 @@ function renderGallery(galleryName) {
 }
 
 function openGallery(galleryName, triggerButton) {
+    const images = galleries[galleryName] || [];
+    const openToken = ++loadingToken;
+
     currentMenuButton = triggerButton;
+    setGalleryLoading(galleryName !== 'us');
     renderGallery(galleryName);
     menuScreen.classList.add('is-hidden');
     passwordPanel.classList.remove('is-open');
     passwordPanel.setAttribute('aria-hidden', 'true');
     galleryShell.classList.add('is-open');
     galleryShell.setAttribute('aria-hidden', 'false');
-    backButton.focus();
+    backButton.focus({ preventScroll: true });
+
+    if (galleryName === 'us' || !images.length) {
+        setGalleryLoading(false);
+        return;
+    }
+
+    Promise.race([
+        preloadImage(images[0]),
+        wait(LOADING_FALLBACK_TIME)
+    ]).then(() => {
+        if (loadingToken === openToken) {
+            setGalleryLoading(false);
+        }
+    });
+
+    preloadGalleryImages(galleryName, 0, 5);
 }
 
 function openPasswordPanel(triggerButton) {
@@ -304,12 +408,14 @@ function closePasswordPanel() {
 }
 
 function closeGallery() {
+    loadingToken += 1;
     clearTimeout(transitionTimeout);
     isAnimating = false;
     list.textContent = '';
     carousel.classList.remove('is-changing', 'is-moving-next', 'is-moving-prev');
     galleryShell.classList.remove('is-postcard');
     galleryShell.classList.remove('is-open');
+    setGalleryLoading(false);
     galleryShell.setAttribute('aria-hidden', 'true');
     menuScreen.classList.remove('is-hidden');
 
@@ -327,6 +433,7 @@ function setActiveIndex(index, direction) {
 
     isAnimating = true;
     activeIndex = getWrappedIndex(images, index);
+    preloadImage(images[activeIndex]);
     carousel.classList.remove('is-moving-next', 'is-moving-prev');
     carousel.classList.add('is-changing', `is-moving-${direction}`);
     renderVisibleSlides();
@@ -352,13 +459,27 @@ prevBtn.addEventListener('click', () => {
 });
 
 menuButtons.forEach((button) => {
+    const galleryName = button.dataset.gallery;
+
+    button.addEventListener('pointerenter', () => {
+        scheduleGalleryWarmup(galleryName, 5);
+    });
+
+    button.addEventListener('focus', () => {
+        scheduleGalleryWarmup(galleryName, 4);
+    });
+
+    button.addEventListener('touchstart', () => {
+        preloadGalleryImages(galleryName, 0, 5);
+    }, { passive: true });
+
     button.addEventListener('click', () => {
         if (button.dataset.protected === 'true') {
             openPasswordPanel(button);
             return;
         }
 
-        openGallery(button.dataset.gallery, button);
+        openGallery(galleryName, button);
     });
 });
 
@@ -406,3 +527,5 @@ document.addEventListener('keydown', (event) => {
         showSlider('prev');
     }
 });
+
+window.addEventListener('load', scheduleMenuWarmups);
